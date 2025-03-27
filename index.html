@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twibbon Ramadhan</title>
+    <title>Twibbon Lebaran</title>
     <style>
         body {
             text-align: center;
@@ -73,7 +73,7 @@
     <button id="downloadBtn" class="btn" onclick="downloadImage()" disabled>Download Twibbon</button>
 
     <script>
-        const twibbonSrc = "TWIBBON RAMADHAN PJSP.png";
+        const twibbonSrc = "TWIBBON LEBARAN PJSP.png";
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
         const twibbon = new Image();
@@ -190,7 +190,7 @@
 
         function downloadImage() {
             const link = document.createElement("a");
-            link.download = "Twibbon-Ramadhan.png";
+            link.download = "Twibbon-Lebaran.png";
             link.href = canvas.toDataURL("image/png");
             link.click();
         }
