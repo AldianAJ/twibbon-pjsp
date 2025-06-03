@@ -73,7 +73,7 @@
     <button id="downloadBtn" class="btn" onclick="downloadImage()" disabled>Download Twibbon</button>
 
     <script>
-        const twibbonSrc = "TWIBBON LEBARAN PJSP.png";
+        const twibbonSrc = "TWIBBON IDUL ADHA PJSP.png";
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
         const twibbon = new Image();
@@ -190,7 +190,7 @@
 
         function downloadImage() {
             const link = document.createElement("a");
-            link.download = "Twibbon-Lebaran.png";
+            link.download = "Twibbon-Idul-Adha.png";
             link.href = canvas.toDataURL("image/png");
             link.click();
         }
