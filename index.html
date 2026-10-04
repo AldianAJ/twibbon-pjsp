@@ -7,21 +7,15 @@
     <title>Twibbon PJSP ✨</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* --accent diganti otomatis sesuai twibbon yang dipilih */
-            --accent: #198754;
+            --accent: #198754; /* diganti otomatis sesuai warna twibbon */
             --accent-soft: color-mix(in srgb, var(--accent) 12%, white);
-            --accent-softer: color-mix(in srgb, var(--accent) 20%, white);
             --accent-dark: color-mix(in srgb, var(--accent) 70%, black);
-            --gold: #e0b43a;
             --text: #1d2330;
             --muted: #667085;
-            --surface: #ffffff;
             --border: #e6e8ec;
-            --radius: 16px;
-            --shadow: 0 24px 60px rgba(16, 24, 40, 0.22);
         }
 
         * {
@@ -37,44 +31,35 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 20px;
             padding: 24px 16px;
             color: var(--text);
             background:
                 radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(224, 180, 58, 0.25), transparent 45%),
-                linear-gradient(160deg, var(--accent-dark), #111827);
-            background-attachment: fixed;
-            transition: background 0.4s;
+                linear-gradient(160deg, var(--accent-dark), #111827) fixed;
         }
 
-        .editor {
+        main {
             width: 100%;
             max-width: 540px;
-            background: var(--surface);
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        .editor-header {
-            padding: 22px 24px 16px;
+            padding: 24px;
             text-align: center;
-            border-bottom: 1px solid var(--border);
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 24px 60px rgba(16, 24, 40, 0.22);
         }
 
         .brand {
             display: inline-block;
             padding: 4px 12px;
-            margin-bottom: 8px;
             font-size: 11px;
             font-weight: 600;
             letter-spacing: 0.06em;
-            color: var(--accent-dark);
-            background: var(--accent-soft);
             border-radius: 999px;
         }
 
         h1 {
+            margin: 8px 0 12px;
             font-size: clamp(19px, 5vw, 24px);
             line-height: 1.3;
             color: var(--accent-dark);
@@ -82,69 +67,46 @@
 
         .steps {
             display: flex;
-            justify-content: center;
-            gap: 14px;
-            margin-top: 12px;
-            list-style: none;
             flex-wrap: wrap;
-        }
-
-        .steps li {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            justify-content: center;
+            gap: 6px 14px;
+            margin-bottom: 18px;
+            list-style: none;
             font-size: 13px;
             color: var(--muted);
+            counter-reset: step;
         }
 
-        .steps li b {
-            display: grid;
+        .steps li::before {
+            counter-increment: step;
+            content: counter(step);
+            display: inline-grid;
             place-items: center;
             width: 22px;
             height: 22px;
+            margin-right: 6px;
             font-size: 12px;
-            color: var(--muted);
             background: var(--border);
             border-radius: 50%;
-            transition: background 0.3s, color 0.3s;
         }
 
-        .steps li.active b,
-        .steps li.done b {
+        .steps li.done::before {
             color: #fff;
             background: var(--accent);
         }
 
-        .steps li.active {
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        .editor-body {
-            padding: 18px 24px 24px;
-        }
-
-        /* --- Kanvas --- */
         .stage {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            border-radius: var(--radius);
+            aspect-ratio: 1;
             overflow: hidden;
-            background: repeating-conic-gradient(#f2f4f7 0% 25%, #fff 0% 50%) 50% / 24px 24px;
             border: 1px solid var(--border);
+            border-radius: 16px;
+            background: repeating-conic-gradient(#f2f4f7 0% 25%, #fff 0% 50%) 50% / 24px 24px;
             touch-action: none; /* Cegah scroll/zoom browser saat menyentuh kanvas */
-            user-select: none;
-            -webkit-user-select: none;
         }
 
         .stage.has-photo { cursor: grab; }
         .stage.dragging { cursor: grabbing; }
-
-        .stage.drop-target {
-            outline: 3px dashed var(--accent);
-            outline-offset: -8px;
-        }
+        .stage.drop-target { outline: 3px dashed var(--accent); outline-offset: -8px; }
 
         canvas {
             display: block;
@@ -152,62 +114,28 @@
             height: 100%;
         }
 
-        .stage-overlay {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 24px;
-            text-align: center;
-            font-size: 14px;
-            color: var(--muted);
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(2px);
-            pointer-events: none;
-        }
-
-        .stage-overlay[hidden] { display: none; }
-
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .hint {
-            margin-top: 10px;
-            font-size: 12px;
-            text-align: center;
+        .status {
+            min-height: 1.5em;
+            margin: 10px 0 14px;
+            font-size: 13px;
             color: var(--muted);
         }
 
-        /* --- Kontrol --- */
+        .status.error { color: #b42318; }
+
+        fieldset {
+            border: none;
+        }
+
         .zoom {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 14px;
         }
 
-        .zoom input[type="range"] {
+        .zoom input {
             flex: 1;
             accent-color: var(--accent);
-            cursor: pointer;
-        }
-
-        .zoom input[type="range"]:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
         }
 
         .actions {
@@ -224,160 +152,101 @@
             gap: 8px;
             padding: 13px 18px;
             font: inherit;
-            font-size: 15px;
             font-weight: 600;
             border: none;
             border-radius: 12px;
             cursor: pointer;
-            transition: background 0.2s, transform 0.15s, box-shadow 0.2s, opacity 0.2s;
-            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.15s, filter 0.2s;
         }
 
-        .btn:not(:disabled):hover { transform: translateY(-1px); }
-        .btn:not(:disabled):active { transform: translateY(0); }
-
-        .btn:focus-visible {
-            outline: 3px solid var(--gold);
-            outline-offset: 2px;
-        }
-
-        .btn:disabled {
-            opacity: 0.45;
-            cursor: not-allowed;
-        }
+        .btn:hover:enabled { transform: translateY(-1px); filter: brightness(0.95); }
+        .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+        .btn:disabled, .zoom input:disabled { opacity: 0.45; cursor: not-allowed; }
 
         .btn svg {
             width: 18px;
             height: 18px;
-            flex-shrink: 0;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
-        .btn-outline {
+        .brand, .btn {
             color: var(--accent-dark);
             background: var(--accent-soft);
         }
 
-        .btn-outline:not(:disabled):hover {
-            background: var(--accent-softer);
-        }
-
         .btn-primary {
             grid-column: 1 / -1;
-            padding: 15px 18px;
-            font-size: 16px;
             color: #fff;
             background: var(--accent);
-            box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 35%, transparent);
         }
 
-        .btn-primary:not(:disabled):hover {
-            background: var(--accent-dark);
-        }
-
-        .btn-icon {
+        .btn-round {
             width: 40px;
             height: 40px;
             padding: 0;
             border-radius: 50%;
         }
 
-        input[type="file"] { display: none; }
-
-        .toast {
-            position: fixed;
-            left: 50%;
-            bottom: 24px;
-            max-width: calc(100% - 32px);
-            padding: 12px 18px;
-            font-size: 14px;
-            color: #fff;
-            background: #111827;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            opacity: 0;
-            transform: translate(-50%, 20px);
-            pointer-events: none;
-            transition: opacity 0.3s, transform 0.3s;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translate(-50%, 0);
-        }
-
-        .toast.error { background: #b42318; }
-
         footer {
-            margin-top: 20px;
             font-size: 12px;
-            text-align: center;
             color: rgba(255, 255, 255, 0.7);
         }
 
         @media (max-width: 400px) {
-            .editor-header { padding: 18px 16px 14px; }
-            .editor-body { padding: 16px; }
-            .steps li span { display: none; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            * { transition: none !important; animation: none !important; }
+            main { padding: 16px; }
         }
     </style>
 </head>
 <body>
-    <main class="editor">
-        <header class="editor-header">
-            <div class="brand">PT PUTERA JAYA SAKTI PERKASA</div>
-            <h1 id="title">Twibbon</h1>
-            <ol class="steps" id="steps">
-                <li class="active"><b>1</b><span>Pilih Foto</span></li>
-                <li><b>2</b><span>Atur Posisi</span></li>
-                <li><b>3</b><span>Unduh</span></li>
-            </ol>
-        </header>
+    <main>
+        <div class="brand">PT PUTERA JAYA SAKTI PERKASA</div>
+        <h1 id="title">Twibbon</h1>
+        <ol class="steps" id="steps">
+            <li>Pilih Foto</li>
+            <li>Atur Posisi</li>
+            <li>Unduh</li>
+        </ol>
 
-        <section class="editor-body">
-            <div class="stage" id="stage">
-                <canvas id="canvas" aria-label="Pratinjau twibbon"></canvas>
-                <div class="stage-overlay" id="overlay">
-                    <div class="spinner"></div>
-                    <p id="overlayText">Memuat twibbon…</p>
-                </div>
-            </div>
-            <p class="hint" id="hint">Pilih foto, atau seret &amp; lepas foto ke area di atas.</p>
+        <div class="stage" id="stage">
+            <canvas id="canvas" aria-label="Pratinjau twibbon"></canvas>
+        </div>
+        <p class="status" id="status" role="status">Memuat twibbon…</p>
 
+        <input type="file" id="upload" accept="image/*" hidden>
+
+        <fieldset id="controls" disabled>
             <div class="zoom">
-                <button id="zoomOutBtn" class="btn btn-outline btn-icon" aria-label="Perkecil" disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/></svg>
+                <button class="btn btn-round" id="zoomOutBtn" aria-label="Perkecil">
+                    <svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>
                 </button>
-                <input type="range" id="zoomSlider" min="0" max="1000" value="0" aria-label="Ukuran foto" disabled>
-                <button id="zoomInBtn" class="btn btn-outline btn-icon" aria-label="Perbesar" disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                <input type="range" id="zoomSlider" min="0" max="1" step="0.001" aria-label="Ukuran foto">
+                <button class="btn btn-round" id="zoomInBtn" aria-label="Perbesar">
+                    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
                 </button>
             </div>
+        </fieldset>
 
-            <div class="actions">
-                <input type="file" id="upload" accept="image/*">
-                <label for="upload" class="btn btn-outline" id="uploadLabel" tabindex="0" role="button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-                    <span id="uploadText">Pilih Foto</span>
-                </label>
-                <button id="resetBtn" class="btn btn-outline" disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-                    Atur Ulang
-                </button>
-                <button id="downloadBtn" class="btn btn-primary" disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-                    Unduh Twibbon
-                </button>
-            </div>
-        </section>
+        <div class="actions">
+            <button class="btn" id="uploadBtn">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                <span id="uploadText">Pilih Foto</span>
+            </button>
+            <button class="btn" id="resetBtn" disabled>
+                <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                Atur Ulang
+            </button>
+            <button class="btn btn-primary" id="downloadBtn" disabled>
+                <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                Unduh Twibbon
+            </button>
+        </div>
     </main>
 
     <footer>&copy; PT Putera Jaya Sakti Perkasa</footer>
-
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script>
         // --- Twibbon yang sedang dipakai ---
@@ -390,354 +259,249 @@
             accent: null
         };
 
-        const CONFIG = {
-            canvasSize: 1080,
-            minZoom: 0.2,   // relatif terhadap ukuran "pas penuh" (cover)
-            maxZoom: 5,
-            zoomStep: 1.1
-        };
+        const SIZE = 1080;          // resolusi hasil unduhan (px)
+        const CENTER = { x: SIZE / 2, y: SIZE / 2 };
+        const MIN_ZOOM = 0.2;       // relatif terhadap ukuran "pas penuh"
+        const MAX_ZOOM = 5;
+        const ZOOM_STEP = 1.1;
 
-        // --- Elemen ---
         const $ = (id) => document.getElementById(id);
         const canvas = $("canvas");
         const ctx = canvas.getContext("2d");
         const stage = $("stage");
-        const overlay = $("overlay");
-        const overlayText = $("overlayText");
-        const titleEl = $("title");
-        const hint = $("hint");
-        const steps = document.querySelectorAll("#steps li");
-        const uploadInput = $("upload");
-        const uploadLabel = $("uploadLabel");
-        const uploadText = $("uploadText");
-        const downloadBtn = $("downloadBtn");
-        const resetBtn = $("resetBtn");
-        const zoomInBtn = $("zoomInBtn");
-        const zoomOutBtn = $("zoomOutBtn");
-        const zoomSlider = $("zoomSlider");
-        const toast = $("toast");
+        const upload = $("upload");
+        const slider = $("zoomSlider");
+        canvas.width = canvas.height = SIZE;
 
-        canvas.width = CONFIG.canvasSize;
-        canvas.height = CONFIG.canvasSize;
-
-        // --- State ---
-        let frame = null;       // HTMLImageElement twibbon yang sudah termuat
-        let userImage = null;   // HTMLImageElement foto pengguna
-        let userImageUrl = null;
-        let baseScale = 1;      // skala "cover" untuk foto saat ini
+        let frame = null;           // gambar twibbon
+        let photo = null;           // foto pengguna
+        let fitScale = 1;           // skala saat foto pas memenuhi kanvas
         const view = { x: 0, y: 0, scale: 1 };
-        const pointers = new Map();
-        let gesture = null;
 
-        // --- Gambar ---
+        // --- Tampilan ---
         function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (userImage) {
-                ctx.imageSmoothingQuality = "high";
-                ctx.drawImage(
-                    userImage,
-                    view.x,
-                    view.y,
-                    userImage.naturalWidth * view.scale,
-                    userImage.naturalHeight * view.scale
-                );
+            ctx.clearRect(0, 0, SIZE, SIZE);
+            if (photo) {
+                ctx.drawImage(photo, view.x, view.y, photo.naturalWidth * view.scale, photo.naturalHeight * view.scale);
             }
-            if (frame) {
-                ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
-            }
+            if (frame) ctx.drawImage(frame, 0, 0, SIZE, SIZE);
         }
 
-        function setStep(index) {
-            steps.forEach((li, i) => {
-                li.classList.toggle("done", i < index);
-                li.classList.toggle("active", i === index);
+        function setStatus(message, isError = false) {
+            $("status").textContent = message;
+            $("status").classList.toggle("error", isError);
+        }
+
+        function setStep(done) {
+            $("steps").querySelectorAll("li").forEach((li, i) => li.classList.toggle("done", i < done));
+        }
+
+        function updateControls() {
+            $("controls").disabled = $("resetBtn").disabled = !photo;
+            $("downloadBtn").disabled = !(photo && frame);
+        }
+
+        // --- Twibbon & warna aksen ---
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
             });
         }
 
-        let toastTimer;
-        function showToast(message, isError = false) {
-            toast.textContent = message;
-            toast.classList.toggle("error", isError);
-            toast.classList.add("show");
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => toast.classList.remove("show"), 3000);
-        }
-
-        function updateButtons() {
-            const ready = Boolean(userImage);
-            [resetBtn, zoomInBtn, zoomOutBtn, zoomSlider].forEach(el => el.disabled = !ready);
-            downloadBtn.disabled = !(ready && frame);
-        }
-
-        // --- Warna aksen otomatis ---
-        // Ambil warna paling dominan (yang cukup "berwarna") dari twibbon,
-        // lalu gelapkan secukupnya supaya teks putih di tombol tetap terbaca.
+        // Ambil warna paling dominan yang cukup "berwarna" dari twibbon, lalu
+        // gelapkan secukupnya supaya teks putih di tombol tetap terbaca.
         function pickAccent(img) {
-            const size = 48;
-            const c = document.createElement("canvas");
-            c.width = c.height = size;
-            const cx = c.getContext("2d", { willReadFrequently: true });
-            cx.drawImage(img, 0, 0, size, size);
-            const data = cx.getImageData(0, 0, size, size).data;
+            const n = 48;
+            const c = Object.assign(document.createElement("canvas"), { width: n, height: n });
+            const cx = c.getContext("2d");
+            cx.drawImage(img, 0, 0, n, n);
+            const px = cx.getImageData(0, 0, n, n).data;
 
-            const bins = Array.from({ length: 12 }, () => ({ w: 0, r: 0, g: 0, b: 0 }));
-            for (let i = 0; i < data.length; i += 4) {
-                const [r, g, b, a] = [data[i], data[i + 1], data[i + 2], data[i + 3]];
-                if (a < 200) continue;
-                const { h, s, l } = rgbToHsl(r, g, b);
+            const bins = Array.from({ length: 12 }, () => ({ weight: 0, h: 0, s: 0, l: 0 }));
+            for (let i = 0; i < px.length; i += 4) {
+                if (px[i + 3] < 200) continue;
+                const [h, s, l] = rgbToHsl(px[i], px[i + 1], px[i + 2]);
                 if (s < 0.35 || l < 0.15 || l > 0.85) continue;
                 const bin = bins[Math.floor(h * 12) % 12];
-                bin.w += s;
-                bin.r += r * s; bin.g += g * s; bin.b += b * s;
+                bin.weight += s;
+                bin.h += h * s; bin.s += s * s; bin.l += l * s;
             }
-            const best = bins.reduce((m, bin) => (bin.w > m.w ? bin : m));
-            if (best.w === 0) return null;
-            const { h, s, l } = rgbToHsl(best.r / best.w, best.g / best.w, best.b / best.w);
+            const best = bins.reduce((a, b) => (b.weight > a.weight ? b : a));
+            if (!best.weight) return null;
+            const [h, s, l] = [best.h, best.s, best.l].map(v => v / best.weight);
             return `hsl(${Math.round(h * 360)} ${Math.round(Math.min(s, 0.85) * 100)}% ${Math.round(Math.min(l, 0.36) * 100)}%)`;
         }
 
         function rgbToHsl(r, g, b) {
-            r /= 255; g /= 255; b /= 255;
-            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            [r, g, b] = [r / 255, g / 255, b / 255];
+            const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
             const l = (max + min) / 2;
-            if (max === min) return { h: 0, s: 0, l };
-            const d = max - min;
-            const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            let h;
-            if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
-            else if (max === g) h = (b - r) / d + 2;
-            else h = (r - g) / d + 4;
-            return { h: h / 6, s, l };
+            if (!d) return [0, 0, l];
+            const s = d / (1 - Math.abs(2 * l - 1));
+            const h = max === r ? (g - b) / d + (g < b ? 6 : 0)
+                    : max === g ? (b - r) / d + 2
+                    : (r - g) / d + 4;
+            return [h / 6, s, l];
         }
 
-        function setAccent(color) {
-            if (color) document.documentElement.style.setProperty("--accent", color);
-        }
-
-        // --- Muat twibbon ---
-        function loadTwibbon() {
-            document.title = `Twibbon ${TWIBBON.title} ✨`;
-            titleEl.textContent = `Twibbon ${TWIBBON.title}`;
-            setAccent(TWIBBON.accent);
-
-            const img = new Image();
-            img.onload = () => {
-                frame = img;
-                if (!TWIBBON.accent) {
-                    try {
-                        setAccent(pickAccent(img));
-                    } catch {
-                        // Gagal membaca piksel (mis. dibuka via file://) — pakai warna bawaan
-                    }
-                }
-                overlay.hidden = true;
-                updateButtons();
-                draw();
-            };
-            img.onerror = () => {
-                overlay.querySelector(".spinner").hidden = true;
-                overlayText.textContent = "Twibbon gagal dimuat. Coba muat ulang halaman.";
-            };
-            img.src = encodeURI(TWIBBON.src);
-        }
-
-        // --- Muat foto pengguna ---
-        function loadPhoto(file) {
-            if (!file) return;
-            if (!file.type.startsWith("image/")) {
-                showToast("File harus berupa gambar (JPG, PNG, dll).", true);
-                return;
+        async function loadTwibbon() {
+            document.title = $("title").textContent = `Twibbon ${TWIBBON.title}`;
+            try {
+                frame = await loadImage(encodeURI(TWIBBON.src));
+            } catch {
+                return setStatus("Twibbon gagal dimuat. Coba muat ulang halaman.", true);
             }
+            let accent = TWIBBON.accent;
+            try {
+                accent ||= pickAccent(frame);
+            } catch {
+                // Piksel tidak bisa dibaca (mis. dibuka via file://) — pakai warna bawaan
+            }
+            if (accent) document.documentElement.style.setProperty("--accent", accent);
+            setStatus("Pilih foto, atau seret & lepas foto ke kotak di atas.");
+            updateControls();
+            draw();
+        }
 
+        // --- Foto pengguna ---
+        async function loadPhoto(file) {
+            if (!file?.type.startsWith("image/")) {
+                return setStatus("File harus berupa gambar (JPG, PNG, dll).", true);
+            }
             const url = URL.createObjectURL(file);
-            const img = new Image();
-            img.onload = () => {
-                if (userImageUrl) URL.revokeObjectURL(userImageUrl);
-                userImageUrl = url;
-                userImage = img;
-                resetView();
-
-                stage.classList.add("has-photo");
-                uploadText.textContent = "Ganti Foto";
-                hint.textContent = "Geser untuk memindahkan, scroll atau cubit (pinch) untuk zoom.";
-                updateButtons();
-                setStep(1);
-            };
-            img.onerror = () => {
+            try {
+                const img = await loadImage(url);
+                if (photo) URL.revokeObjectURL(photo.src);
+                photo = img;
+            } catch {
                 URL.revokeObjectURL(url);
-                showToast("Foto tidak bisa dibaca. Coba foto lain.", true);
-            };
-            img.src = url;
+                return setStatus("Foto tidak bisa dibaca. Coba foto lain.", true);
+            }
+            fitScale = Math.max(SIZE / photo.naturalWidth, SIZE / photo.naturalHeight);
+            resetView();
+            stage.classList.add("has-photo");
+            $("uploadText").textContent = "Ganti Foto";
+            setStatus("Geser untuk memindahkan, scroll atau cubit (pinch) untuk zoom.");
+            setStep(1);
+            updateControls();
         }
 
         function resetView() {
-            baseScale = Math.max(
-                canvas.width / userImage.naturalWidth,
-                canvas.height / userImage.naturalHeight
-            );
-            view.scale = baseScale;
-            view.x = (canvas.width - userImage.naturalWidth * view.scale) / 2;
-            view.y = (canvas.height - userImage.naturalHeight * view.scale) / 2;
-            syncSlider();
+            view.scale = fitScale;
+            view.x = (SIZE - photo.naturalWidth * fitScale) / 2;
+            view.y = (SIZE - photo.naturalHeight * fitScale) / 2;
+            slider.value = zoomToSlider(1);
             draw();
         }
 
         // --- Zoom ---
-        // Slider memakai skala logaritmik supaya terasa rata di seluruh rentang.
-        function syncSlider() {
-            const rel = view.scale / baseScale;
-            const t = Math.log(rel / CONFIG.minZoom) / Math.log(CONFIG.maxZoom / CONFIG.minZoom);
-            zoomSlider.value = Math.round(t * 1000);
-        }
+        // Slider (0..1) dipetakan secara logaritmik ke MIN_ZOOM..MAX_ZOOM.
+        const zoomToSlider = (zoom) => Math.log(zoom / MIN_ZOOM) / Math.log(MAX_ZOOM / MIN_ZOOM);
+        const sliderToZoom = (t) => MIN_ZOOM * (MAX_ZOOM / MIN_ZOOM) ** t;
 
-        function zoomTo(newScale, cx, cy) {
-            if (!userImage) return;
-            const min = baseScale * CONFIG.minZoom;
-            const max = baseScale * CONFIG.maxZoom;
-            newScale = Math.min(max, Math.max(min, newScale));
-            const factor = newScale / view.scale;
-            // Pertahankan titik (cx, cy) tetap di tempat saat zoom
-            view.x = cx - (cx - view.x) * factor;
-            view.y = cy - (cy - view.y) * factor;
-            view.scale = newScale;
-            syncSlider();
+        // Zoom ke skala baru dengan titik `at` tetap di tempat
+        function zoomTo(scale, at = CENTER) {
+            if (!photo) return;
+            scale = Math.min(fitScale * MAX_ZOOM, Math.max(fitScale * MIN_ZOOM, scale));
+            const factor = scale / view.scale;
+            view.x = at.x - (at.x - view.x) * factor;
+            view.y = at.y - (at.y - view.y) * factor;
+            view.scale = scale;
+            slider.value = zoomToSlider(scale / fitScale);
             draw();
         }
 
-        const mid = CONFIG.canvasSize / 2;
-        zoomInBtn.addEventListener("click", () => zoomTo(view.scale * CONFIG.zoomStep, mid, mid));
-        zoomOutBtn.addEventListener("click", () => zoomTo(view.scale / CONFIG.zoomStep, mid, mid));
-        zoomSlider.addEventListener("input", () => {
-            const t = zoomSlider.value / 1000;
-            const rel = CONFIG.minZoom * Math.pow(CONFIG.maxZoom / CONFIG.minZoom, t);
-            zoomTo(baseScale * rel, mid, mid);
-        });
+        $("zoomInBtn").onclick = () => zoomTo(view.scale * ZOOM_STEP);
+        $("zoomOutBtn").onclick = () => zoomTo(view.scale / ZOOM_STEP);
+        slider.oninput = () => zoomTo(fitScale * sliderToZoom(+slider.value));
 
-        // --- Geser & cubit (Pointer Events: mouse, sentuh, pena) ---
-        function toCanvasPoint(clientX, clientY) {
+        canvas.addEventListener("wheel", (e) => {
+            if (!photo) return;
+            e.preventDefault();
+            // ctrlKey = pinch di trackpad (delta kecil), selain itu scroll mouse
+            zoomTo(view.scale * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015)), toCanvasPoint(e));
+        }, { passive: false });
+
+        // --- Geser & cubit (mouse, sentuh, pena) ---
+        const pointers = new Map();
+        let gesture = null;
+
+        function toCanvasPoint(e) {
             const rect = canvas.getBoundingClientRect();
             return {
-                x: (clientX - rect.left) * (canvas.width / rect.width),
-                y: (clientY - rect.top) * (canvas.height / rect.height)
+                x: (e.clientX - rect.left) * SIZE / rect.width,
+                y: (e.clientY - rect.top) * SIZE / rect.height
             };
         }
 
-        // Hitung ulang titik awal gestur setiap kali jumlah jari berubah,
-        // supaya foto tidak "melompat" saat jari ditambah/diangkat.
-        function startGesture() {
-            const pts = [...pointers.values()];
-            stage.classList.toggle("dragging", pts.length > 0);
-            if (pts.length === 0) {
-                gesture = null;
-            } else if (pts.length === 1) {
-                gesture = { type: "pan", last: pts[0] };
-            } else {
-                const [a, b] = pts;
-                gesture = {
-                    type: "pinch",
-                    dist: Math.hypot(a.x - b.x, a.y - b.y),
-                    mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }
-                };
-            }
+        // Pusat & jarak antar-jari (untuk satu jari: posisinya sendiri, jarak 0)
+        function measure() {
+            const [a, b = a] = pointers.values();
+            return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, dist: Math.hypot(a.x - b.x, a.y - b.y) };
+        }
+
+        // Dipanggil setiap jumlah jari berubah supaya foto tidak "melompat"
+        function restartGesture() {
+            gesture = pointers.size ? measure() : null;
+            stage.classList.toggle("dragging", !!gesture);
         }
 
         canvas.addEventListener("pointerdown", (e) => {
-            if (!userImage) return;
+            if (!photo) return;
             canvas.setPointerCapture(e.pointerId);
-            pointers.set(e.pointerId, toCanvasPoint(e.clientX, e.clientY));
-            startGesture();
+            pointers.set(e.pointerId, toCanvasPoint(e));
+            restartGesture();
         });
 
         canvas.addEventListener("pointermove", (e) => {
-            if (!pointers.has(e.pointerId) || !gesture) return;
-            pointers.set(e.pointerId, toCanvasPoint(e.clientX, e.clientY));
-            const pts = [...pointers.values()];
-
-            if (gesture.type === "pan") {
-                const p = pts[0];
-                view.x += p.x - gesture.last.x;
-                view.y += p.y - gesture.last.y;
-                gesture.last = p;
-                draw();
-            } else {
-                const [a, b] = pts;
-                const dist = Math.hypot(a.x - b.x, a.y - b.y);
-                const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-                // Geser mengikuti titik tengah dua jari, lalu zoom di titik itu
-                view.x += center.x - gesture.mid.x;
-                view.y += center.y - gesture.mid.y;
-                if (gesture.dist > 0) zoomTo(view.scale * (dist / gesture.dist), center.x, center.y);
-                else draw();
-                gesture.dist = dist;
-                gesture.mid = center;
-            }
+            if (!pointers.has(e.pointerId)) return;
+            pointers.set(e.pointerId, toCanvasPoint(e));
+            const now = measure();
+            view.x += now.x - gesture.x;
+            view.y += now.y - gesture.y;
+            if (pointers.size > 1 && gesture.dist) zoomTo(view.scale * now.dist / gesture.dist, now);
+            else draw();
+            gesture = now;
         });
 
-        function endPointer(e) {
-            if (!pointers.delete(e.pointerId)) return;
-            startGesture();
+        for (const type of ["pointerup", "pointercancel"]) {
+            canvas.addEventListener(type, (e) => pointers.delete(e.pointerId) && restartGesture());
         }
-        canvas.addEventListener("pointerup", endPointer);
-        canvas.addEventListener("pointercancel", endPointer);
 
-        canvas.addEventListener("wheel", (e) => {
-            if (!userImage) return;
-            e.preventDefault();
-            const p = toCanvasPoint(e.clientX, e.clientY);
-            // ctrlKey = pinch di trackpad (delta kecil), selain itu scroll mouse
-            const factor = Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015));
-            zoomTo(view.scale * factor, p.x, p.y);
-        }, { passive: false });
+        // --- Upload: tombol & seret-lepas ---
+        $("uploadBtn").onclick = () => upload.click();
+        upload.onchange = () => {
+            loadPhoto(upload.files[0]);
+            upload.value = ""; // agar file yang sama bisa dipilih lagi
+        };
 
-        // --- Upload: tombol & drag-and-drop ---
-        uploadInput.addEventListener("change", () => {
-            loadPhoto(uploadInput.files[0]);
-            uploadInput.value = ""; // agar file yang sama bisa dipilih lagi
-        });
-
-        uploadLabel.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
+        for (const type of ["dragenter", "dragover", "dragleave", "drop"]) {
+            stage.addEventListener(type, (e) => {
                 e.preventDefault();
-                uploadInput.click();
-            }
-        });
+                stage.classList.toggle("drop-target", type === "dragenter" || type === "dragover");
+                if (type === "drop") loadPhoto(e.dataTransfer.files[0]);
+            });
+        }
 
-        ["dragenter", "dragover"].forEach(type => stage.addEventListener(type, (e) => {
-            e.preventDefault();
-            stage.classList.add("drop-target");
-        }));
-        ["dragleave", "drop"].forEach(type => stage.addEventListener(type, (e) => {
-            e.preventDefault();
-            stage.classList.remove("drop-target");
-        }));
-        stage.addEventListener("drop", (e) => loadPhoto(e.dataTransfer.files[0]));
-
-        resetBtn.addEventListener("click", () => userImage && resetView());
+        $("resetBtn").onclick = resetView;
 
         // --- Unduh ---
-        downloadBtn.addEventListener("click", () => {
-            if (!frame || !userImage) return;
-            downloadBtn.disabled = true;
+        $("downloadBtn").onclick = () => {
             canvas.toBlob((blob) => {
-                updateButtons();
-                if (!blob) {
-                    showToast("Gagal membuat gambar. Coba lagi.", true);
-                    return;
-                }
-                const url = URL.createObjectURL(blob);
+                if (!blob) return setStatus("Gagal membuat gambar. Coba lagi.", true);
                 const link = document.createElement("a");
-                link.href = url;
-                link.download = `Twibbon-${TWIBBON.title.replace(/[^\w]+/g, "-")}.png`;
-                document.body.appendChild(link);
+                link.href = URL.createObjectURL(blob);
+                link.download = `Twibbon-${TWIBBON.title.replace(/\W+/g, "-")}.png`;
                 link.click();
-                link.remove();
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                setTimeout(() => URL.revokeObjectURL(link.href), 1000);
                 setStep(3);
-                showToast("Twibbon berhasil diunduh. Terima kasih! 🎉");
+                setStatus("Twibbon berhasil diunduh. Terima kasih! 🎉");
             }, "image/png");
-        });
+        };
 
-        // --- Mulai ---
         loadTwibbon();
     </script>
 </body>
